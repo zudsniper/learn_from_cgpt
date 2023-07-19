@@ -1,0 +1,52 @@
+topic: fon.bet scraper audit for meh
+cgpt:
+  link: https://chat.openai.com/share/9caa48f8-aab2-4ae1-a08b-ee7c07c9344f
+  version: "GPT-4 w/ Plugins"
+  plugins: 
+    - Metaphor Search
+    - Link Reader
+    - Chat Stack Search   
+gist: 'https://gist.github.com/zudsniper/c1fa1068ec8d31a137aea312ed5c9f60'
+prompts: 
+ - _1: "Here is a web-scraping script for a website called fro.bet written is JS with nodeJS, puppeteer and puppeteer extensions. Please optimize and increase the readabilty of the script, and exchange the driver application for puppeteer to use `undetected-chromedriver`. Here is the link to the script in question: https://gist.githubusercontent.com/zudsniper/c1fa1068ec8d31a137aea312ed5c9f60/raw/scraper.js"
+ - _2: "Please add javadoc like comments to the each method header"
+ - _3: "Please add nodeJS package `loglevel`, configure it to have colorized console output, and then add extensive comments, especially of the DEBUG & INFO level, and of course WARN, ERROR, and FATAL when necessary. Add these comment messages where it is sensible to add them in order to make this script more troubleshooting-friendly. Also move all specific hardcoded information should be moved into const final variables in the scripts root class, titled in SCREAMING_SNAKE case as such. "
+ - _4: "Please make it so that the main scraping loop is interruptable (making the application quit gracefully with some statistics about the run execution such as execution time, betting elements, success, etc when \"q\" is pressed at any time during the execution of the script." 
+ - _5: "Confgure loglevel to print logs in the appropriate color based on its execution level (DEBUG = cyan; INFO = white, WARN = yellow, ERROR = red, FATAL = magenta) as well as only print the timestamp with the format (use 24 hour time) \"hh:mm:ss\". An example of an output message would be 
+       code_start
+       23:32:21 [WARN] This is an example message. 
+       code_end
+ wherein the text \"WARN\" would be colored yellow. 
+ Also add colorization to the script where it seems reasonable to, for instance printing a green message when the script is successful at something, along with printing ALL DEBUG level message content in grey."
+ 
+ - _6: "Please generate an accompanying cross-platform viable setup script (either include a `.sh` and `.ps1` or `.bat` file to support Windows, MacOS, and Linux, or write in a language which needn't be installed and is interpretable on all operating systems.)
+    which prepares the project to run by 
+  Including a commented out header which contains the assumed nodeJS version which the previous js code was generated for, as well as a title header in a figfont, \"---\" (but of the appropriate length) dividers, and a short description of the purpose of the scraper. 
+  2. checking for necessary command line tools such as node & npm, installs them via nvm on linux (which itself may need to be installed -- if so, use https://gh.zod.tf/bashbits/raw/master/get_nvm.sh to install it, then use it to install and set default the version of node noted earlier in the header comment.), homebrew on MacOS, and scoop on Windows (for both Homebrew and `scoop`, please check for their installation, and if it is not found, print an ERROR message with appropriate coloring (probably using ANSI escape codes) which instructs the executor to install the appropriate command line tool, and provides a link to the installation instructions of the tool in question.) Also generate an appropriate package.json with the dependency version levels which you are assuming to be used within this script.
+  2. This must also check for & if necessary subsequently install undetected-chromedriver, link it appropriately so that the js script can use it (however this is done), and print a message giving the `undetected-chromedriver` version as well as an affirmative or error message if the installation is successful for use. 
+  3. Run necessary commands to prepare the script for use, such as `npm install`. 
+  4. Execute the script itself (passing through any command line parameters to the nodeJS script if they are present)
+  This execution script should essentially, if all tools are already installed, act as a simple runner script."
+ - _7: "Print versions for everything you install, with no exceptions.Also please place the nodeJS version in a global sh variable, and then utilize the version number for the node and npm installations via nvm after nvm is installed. Please also include the nvm commands \"nvm use {node_version}\" and  \"nvm alias default {node_version)\" in the linux nvm installation flow. After finishing this updated .sh script, please generate an equivalent ps1 script for windows users, which replaces automated installing of homebrew or nvm with automated installation of scoop, if it is not present, then use of scoop to obtain nodejs (node & npm)."
+ - _8: "For both scripts,
+  1. please add color & tact to the script mimicing the style of command line tools like pip3, with its unicode, colored, and speed displaying installation print flow. 
+  2. Please also do not simply install the exact version of nodejs that this script is written for, but instead add a new variable called INSTALL_NODE_VERSION, which holds \"16.18.0\". Use this node version for new installations, but the previous NODE_VERSION variable for checking if the sufficient node version for execution is present.
+
+  For the bash script, modify the `nvm -> node` installation checks so that first it is determined whether the system has nvm first, if not it is installed via the script provided (which calls exit 0, so must be captured in a variable or in some other way have this exit not stop the entire script and instead continue execution.)
+  Only after this is the node installation, and version, checked, and modified as necessary via the `nvm` linux command line tool. 
+
+  For the powershell script, please focus on implementing the colored and quality user experience mentioned at the beginning of this prompt, as well as adding the checking for and installation of if necessary scoop CLI package manager, which should then be used for subsequent installations where possible, such as nodejs. Additionally, check for and print the current nodejs version if it is installed, and if installed, determine if the installed version is greater than the necessary version to run the script. If so, print a message (with color) that explains this, then continue execution. If the system has a node version which is too old, print a warning message, then uninstall this old version, replacing it with a more recent version via scoop. Follow the description in the beginning of this prompt to handle installation versions (meaning in this case, generally allow scoop to choose the node version, unless it is far too new (anything above node 18))"
+ - _9: "for both scripts, please determine necessary (or requirement of the lack thereof) permissions for each dependency, and use this knowledge to inform whether or not your script needs to check for administrative privileges, and should rely on them throughout. 
+
+  for the bash script, please check for the installation of, and download and source if not installed, my ~/.ansi_colors.sh script, which is available at https://gh.zod.tf/bashbits/raw/master/.ansi_colors.sh. 
+  also handle the permissions requirement mentioned at the beginning of this prompt by checking for `sudo` group on the current user, then, depending om whether or not you determine sudo to be necessary in at least 1 of the steps of the installation process, error out of the installation with a verbose error message with a bold red Header and a simply red text description of the problem and what could be done to solve it. Also handle the case where the executing user is root, after determining if this is even allowed, and if it is not, (such is the case for homebrew, for instance) then printing an error in the same style letting this executing user know that the user `root` cannot be used for this installation script, and to please switch to a different user who is simply a member of the `sudo` group, sometimes called sudoers. 
+  For the powershell script, check permissions as mentioned above via UAC, and if necessary require the script to be run as an administrator by popping up the \"run as administrator?\" windows popup, and proceeding if administrative execution permission is granted. If not, exist with a well-formatted error in red."
+ - x10: "The bash script you generated did not check for installation, install, or even acknowledge the color script I asked it to use, located at https://gh.zod.tf/bashbits/raw/master/.ansi_colors.sh, which is a valid URL that was ignored. Please implement, and then exclusively use the \"${A_*}\" type variables sourced from within it, in the bash script. The ps1 script looks alright."
+ - _11: "Please access the link I have mentioned for the ~/.ansi_colors.sh file, analyze it, and then go about the previous prompt." 
+ - x12: "You are still using variables that don't exist, such as ${A_BRed}. Please try to access the link & analyze it, then, crucially starting from the bash script version you generated before ${A_*} variables were included, try to implement them again, this time using the context of the contents of the sourced & if necessary downloaded ~/.ansi_colors.sh." 
+
+complaints: 
+  - _9: "The bash script did not check for installation, install, or even acknowledge the color script I asked it to use, located at https://gh.zod.tf/bashbits/raw/master/.ansi_colors.sh, which is a valid URL that was ignored."
+  - x10: "My request was sort of honored, but used incorrectly. I realize now that I did not prompt gpt4 to actually access the link and understand its contents before trying to use it, and this is what is causing the problem. Maybe the agent could deduce it might need to know what are inside the contents of a script it is asked to download and then run and use."
+  - _11: "the agent continues to use nonsense variables it made up from its last execution, not realizing it must start from before it was using these made-up variables. I will prompt it to start from the bash script version before the ${A_BRed} and all similar variables were added."
+  - x12: "The script STILL used non-existent variables, after seemingly recognizing its mistake in its message. **It is time for a new instance of the agent.**"
